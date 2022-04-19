@@ -40,6 +40,9 @@ namespace BatchHTTPRequests
             this.btn_POST = new System.Windows.Forms.Button();
             this.btn_PUT = new System.Windows.Forms.Button();
             this.btn_DELETE = new System.Windows.Forms.Button();
+            this.btn_PUT_template = new System.Windows.Forms.Button();
+            this.btn_POST_template = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // richTextBox2
@@ -140,11 +143,44 @@ namespace BatchHTTPRequests
             this.btn_DELETE.UseVisualStyleBackColor = true;
             this.btn_DELETE.Click += new System.EventHandler(this.btn_DELETE_Click);
             // 
+            // btn_PUT_template
+            // 
+            this.btn_PUT_template.Location = new System.Drawing.Point(669, 91);
+            this.btn_PUT_template.Name = "btn_PUT_template";
+            this.btn_PUT_template.Size = new System.Drawing.Size(75, 23);
+            this.btn_PUT_template.TabIndex = 22;
+            this.btn_PUT_template.Text = "PUT样例";
+            this.btn_PUT_template.UseVisualStyleBackColor = true;
+            this.btn_PUT_template.Click += new System.EventHandler(this.btn_PUT_template_Click);
+            // 
+            // btn_POST_template
+            // 
+            this.btn_POST_template.Location = new System.Drawing.Point(669, 120);
+            this.btn_POST_template.Name = "btn_POST_template";
+            this.btn_POST_template.Size = new System.Drawing.Size(75, 23);
+            this.btn_POST_template.TabIndex = 22;
+            this.btn_POST_template.Text = "POST样例";
+            this.btn_POST_template.UseVisualStyleBackColor = true;
+            this.btn_POST_template.Click += new System.EventHandler(this.btn_POST_template_Click);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(525, 205);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(263, 60);
+            this.label3.TabIndex = 23;
+            this.label3.Text = "PUT支持：\r\n{{time(d|h|m|s)(+|-)7:2020-03-29 20:00:00}}\r\n\r\nPOST支持：\r\n{{date(+|-)7:2020" +
+    "-03-29}}";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.btn_POST_template);
+            this.Controls.Add(this.btn_PUT_template);
             this.Controls.Add(this.richTextBox2);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox2);
@@ -178,6 +214,9 @@ namespace BatchHTTPRequests
         private System.Windows.Forms.Button btn_POST;
         private System.Windows.Forms.Button btn_PUT;
         private System.Windows.Forms.Button btn_DELETE;
+        private System.Windows.Forms.Button btn_PUT_template;
+        private System.Windows.Forms.Button btn_POST_template;
+        private System.Windows.Forms.Label label3;
     }
 }
 

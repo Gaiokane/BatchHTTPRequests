@@ -34,6 +34,10 @@ namespace BatchHTTPRequests
         Regex rgGetDateTimeDiff = new Regex("(d|h|m|s)(\\+|\\-)\\d*");//{{timed+-7:2020-03-29 20:00:00}}取(d|h|m|s)(+|-)数字
         Regex rgGetDateTime = new Regex("\\d{4}-(0?[1-9]|1[0-2])-((0?[1-9])|((1|2)[0-9])|30|31) (((0|1)[0-9])|(2[0-3])):((0|1|2|3|4|5)[0-9]):((0|1|2|3|4|5)[0-9])");//{{timed+-7:2020-03-29 20:00:00}}取时间
 
+        Regex rgGetDateAll = new Regex("{{date(\\+|\\-)\\d*:\\d{4}-(0?[1-9]|1[0-2])-((0[1-9])|((1|2)[0-9])|30|31)}}");//{{date(+|-)7:2020-03-29}}取整块 日
+        Regex rgGetDateDiff = new Regex("(\\+|\\-)\\d*");//{{date+-7:2020-03-29 20:00:00}}取(+|-)数字
+        Regex rgGetDate = new Regex("\\d{4}-(0?[1-9]|1[0-2])-((0[1-9])|((1|2)[0-9])|30|31)");//{{timed+-7:2020-03-29}}取时间
+
         public Form1()
         {
             InitializeComponent();
@@ -41,14 +45,12 @@ namespace BatchHTTPRequests
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            richTextBox1.Text = "{\"t0\":\"1627660800000000000\",\"t1\":\"1627660800000000000\",\"name\":\"point_audit_1\"}";
-            richTextBox1.Text = "{\"t0\":\"{{timed+1:2021-07-08 00:00:00}}\",\"t1\":\"{{timed+1:2021-07-08 00:00:00}}\",\"name\":\"point_audit_1\",\"matcher-sn\":\"sn =~ /^(210)$/\",\"sn\":\"210\"}";
-            richTextBox1.Text = "{\"t0\":\"{{timed+1:2020-06-01 00:00:00}}\",\"t1\":\"{{timed+1:2021-07-08 00:00:00}}\",\"name\":\"point_audit_1\"}";
+            //PUT 环境质量初始数据
+            putTemplate();
 
-            textBox2.Text = "http://192.168.30.73:9002/admin/task";
-            textBox2.Text = "http://192.168.90.244:9002/admin/task";
+            //POST 污染源初始数据
+            //postTemplate();
 
-            textBox1.Text = "407";
 
             textBox1.Select();
             textBox1.Focus();
@@ -61,6 +63,45 @@ namespace BatchHTTPRequests
             RichTextBoxMenu richTextBoxMenu_richTextBox1 = new RichTextBoxMenu(richTextBox1);
             RichTextBoxMenu richTextBoxMenu_richTextBox2 = new RichTextBoxMenu(richTextBox2);
 
+        }
+
+        //PUT 环境质量初始数据
+        private void putTemplate()
+        {
+            #region 环境质量初始数据
+            richTextBox1.Text = "{\"t0\":\"1627660800000000000\",\"t1\":\"1627660800000000000\",\"name\":\"point_audit_1\"}";
+            richTextBox1.Text = "{\"t0\":\"{{timed+1:2021-07-08 00:00:00}}\",\"t1\":\"{{timed+1:2021-07-08 00:00:00}}\",\"name\":\"point_audit_1\",\"matcher-sn\":\"sn =~ /^(210)$/\",\"sn\":\"210\"}";
+            richTextBox1.Text = "{\"t0\":\"{{timed+1:2020-06-01 00:00:00}}\",\"t1\":\"{{timed+1:2021-07-08 00:00:00}}\",\"name\":\"point_audit_1\"}";
+
+            textBox2.Text = "http://192.168.30.73:9002/admin/task";
+            textBox2.Text = "http://192.168.90.244:9002/admin/task";
+
+            textBox1.Text = "407";
+            #endregion
+        }
+
+        //POST 污染源初始数据
+        private void postTemplate()
+        {
+            #region 污染源初始数据
+            richTextBox1.Text = "{\"portIds\":\"1\",\"portType\":1,\"rule\":true,\"portGroup\":50,\"timeGroup\":10,\"beginTime\":\"{{date+1:2021-04-14}}\",\"endTime\":\"{{date+1:2021-04-14}}\",\"task\":\"gen\"}";
+
+            textBox2.Text = "http://192.168.30.77:8082/v1/audit";
+
+            textBox1.Text = "30";
+            #endregion
+        }
+
+        private void btn_PUT_template_Click(object sender, EventArgs e)
+        {
+            //PUT 环境质量初始数据
+            putTemplate();
+        }
+
+        private void btn_POST_template_Click(object sender, EventArgs e)
+        {
+            //POST 污染源初始数据
+            postTemplate();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -82,6 +123,101 @@ namespace BatchHTTPRequests
         private void btn_DELETE_Click(object sender, EventArgs e)
         {
             MessageBox.Show("empty");
+        }
+
+        private void btn_POST_Click(object sender, EventArgs e)
+        {
+            //MessageBox.Show("empty");
+
+            /*WebClient wc = new WebClient();
+            string strUrlPara = "{\"t0\":\"1627660800000000000\",\"t1\":\"1627660800000000000\",\"name\":\"point_audit_1\"}";
+            strUrlPara = HttpUtility.UrlEncode(strUrlPara);
+            byte[] data = new ASCIIEncoding().GetBytes(strUrlPara);
+            byte[] responseArray = wc.UploadData("http://192.168.30.73:9002/admin/task", data);
+            var response = Encoding.UTF8.GetString(responseArray);
+            //return response;
+            MessageBox.Show(response);*/
+
+
+
+            if (string.IsNullOrEmpty(textBox1.Text.Trim()))
+            {
+                MessageBox.Show("执行次数不能为空！");
+                textBox1.Focus();
+            }
+            else
+            {
+                int times = Convert.ToInt32(textBox1.Text.Trim());
+                sqlQuerys = new string[times];
+                for (int i = 0; i < times; i++)
+                {
+                    sqlQuerys[i] = richTextBox1.Text.Trim();
+                }
+
+                DateTime dt = DateTime.Now;
+                string str = "";
+                string type = "";
+                string symbol = "";
+                int length = 0;
+
+                #region 判断是否有匹配{{date(+|-)7:date}}
+                //判断是否有匹配{{date(+|-)7:date}}
+                if (rgGetDateAll.IsMatch(sqlQuerys[0]))
+                {
+                    Match matchDateAll;
+                    Match matchDateDiff;
+                    Match matchDate;
+                    matchDateAll = rgGetDateAll.Match(sqlQuerys[0]);//{{date(+|-)7:2020-03-29}}取整块 日
+                    matchDateDiff = rgGetDateDiff.Match(matchDateAll.Groups[0].Value);//{{date+-7:2020-03-29}}取(+|-)数字
+                    matchDate = rgGetDate.Match(matchDateAll.Groups[0].Value);//{{date+-7:2020-03-29}}取时间
+                    dt = Convert.ToDateTime(matchDate.Groups[0].Value);
+                    str = matchDateDiff.Groups[0].Value;//取(d|h|m|s)(+|-)数字
+                    symbol = str.Substring(0, 1);//(+|-)
+                    length = Convert.ToInt32(str.Substring(1, str.Length - 1));//数字
+
+
+                    //MessageBox.Show("true");
+                    getNewDate(sqlQuerys);
+                }
+                else
+                {
+                    //MessageBox.Show("没有匹配项{{date(+|-)7:date}}");
+                    noMatch += "没有匹配项{{date(+|-)7:date}}\n";
+                }
+                #endregion
+
+                JavaScriptSerializer s = new JavaScriptSerializer();
+
+                richTextBox2.Text = "";
+
+                for (int i = 0; i < times; i++)
+                {
+                    Dictionary<string, object> JsonData = (Dictionary<string, object>)s.DeserializeObject(ConvertJsonString(sqlQuerys[i]));
+                    //Dictionary<string, string> JsonData = (Dictionary<string, string>)JsonConvert.DeserializeObject(ConvertJsonString(richTextBox1.Text));
+                    //Dictionary<string, string> JsonData = richTextBox1.Text.Trim().Split(',').ToDictionary(s => s.Split(':')[0].Replace("\"", ""), s => s.Split(':')[1].Replace("\"", ""));
+                    //MessageBox.Show(HttpPut("http://192.168.30.73:9002/admin/task", obj));
+
+                    try
+                    {
+                        //string result = HttpPut("http://192.168.30.73:9002/admin/task", JsonData);
+                        string result = HttpPost(textBox2.Text.Trim(), JsonData);
+                        if (result != "{\"msg\":\"ok\"}")
+                        {
+                            //MessageBox.Show(dt.ToString("yyyy-MM-dd HH:mm:ss") + "_" + type + symbol + i + "：" + result);
+                            richTextBox2.Text += "\r\n" + dt.ToString("yyyy-MM-dd HH:mm:ss") + "_" + type + symbol + i + "：" + result;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //MessageBox.Show(ex.Message);
+                        richTextBox2.Text += "\r\n" + ex.Message;
+                    }
+
+                    //MessageBox.Show(dt.ToString("yyyy-MM-dd HH:mm:ss") + "_" + type + symbol + i + "：" + HttpPut("http://192.168.30.73:9002/admin/task", JsonData));
+                }
+                MessageBox.Show("执行结束");
+            }
+
         }
 
         private void btn_PUT_Click(object sender, EventArgs e)
@@ -277,7 +413,7 @@ namespace BatchHTTPRequests
             return content;
         }
 
-        public static string HttpPost(string url, Dictionary<String, String> param)
+        public static string HttpPost(string url, Dictionary<String, object> param)
         {
             HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest; //创建请求
             CookieContainer cookieContainer = new CookieContainer();
@@ -294,7 +430,21 @@ namespace BatchHTTPRequests
             {
                 foreach (var item in param)
                 {
-                    json.Add(item.Key, item.Value);
+                    //MessageBox.Show(item.Value.GetType().ToString());
+                    var itemValue = item.Value;
+                    if (itemValue.GetType() == typeof(int))
+                    {
+                        json.Add(item.Key, Convert.ToInt32(itemValue));
+                    }
+                    if (itemValue.GetType() == typeof(Boolean))
+                    {
+                        json.Add(item.Key, Convert.ToBoolean(itemValue));
+                    }
+                    if (itemValue.GetType() == typeof(string))
+                    {
+                        json.Add(item.Key, Convert.ToString(itemValue));
+                    }
+                    //json.Add(item.Key, item.Value.ToString());
                 }
             }
             string jsonstring = json.ToString();//获得参数的json字符串
@@ -315,20 +465,6 @@ namespace BatchHTTPRequests
             StreamReader sr = new StreamReader(res.GetResponseStream(), Encoding.UTF8);
             string content = sr.ReadToEnd(); //获得响应字符串
             return content;
-        }
-
-        private void btn_POST_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("empty");
-
-            /*WebClient wc = new WebClient();
-            string strUrlPara = "{\"t0\":\"1627660800000000000\",\"t1\":\"1627660800000000000\",\"name\":\"point_audit_1\"}";
-            strUrlPara = HttpUtility.UrlEncode(strUrlPara);
-            byte[] data = new ASCIIEncoding().GetBytes(strUrlPara);
-            byte[] responseArray = wc.UploadData("http://192.168.30.73:9002/admin/task", data);
-            var response = Encoding.UTF8.GetString(responseArray);
-            //return response;
-            MessageBox.Show(response);*/
         }
 
         private void btn_GET_Click(object sender, EventArgs e)
@@ -456,6 +592,56 @@ namespace BatchHTTPRequests
                             //用这条，仅替换第一个匹配对象
                             sourceSQL[i] = rgGetDateTimeAll.Replace(sourceSQL[i], DateTimeToTstamp(Convert.ToDateTime(dt.AddSeconds(-(length * i)).ToString("yyyy-MM-dd HH:mm:ss"))).ToString(), 1);
                         }
+                    }
+                }
+            }
+
+            return sourceSQL;
+        }
+        #endregion
+
+        #region 将date(+|-)7:2020-03-29}}指定时间并递增
+        /// <summary>
+        /// 将date(+|-)7:2020-03-29}}指定时间并递增
+        /// </summary>
+        /// <param name="sourceSQL">原始SQL数组</param>
+        /// <returns>替换完的数组</returns>
+        private string[] getNewDate(string[] sourceSQL)
+        {
+            //{{date+777:2020-04-04}}
+
+            Match matchDateAll;
+            Match matchDateDiff;
+            Match matchDate;
+
+            while (rgGetDateAll.Match(sourceSQL[0]).Success == true)
+            {
+                for (int i = 0; i < sourceSQL.Length; i++)
+                {
+                    matchDateAll = rgGetDateAll.Match(sourceSQL[i]);//{{date(+|-)7:2020-03-29}}取整块 日
+                    matchDateDiff = rgGetDateDiff.Match(matchDateAll.Groups[0].Value);//{{date+-7:2020-03-29}}取(+|-)数字
+                    matchDate = rgGetDate.Match(matchDateAll.Groups[0].Value);//{{date+-7:2020-03-29}}取时间
+                    DateTime dt = Convert.ToDateTime(matchDate.Groups[0].Value);
+                    string str = matchDateDiff.Groups[0].Value;//取(+|-)数字
+                    string symbol = str.Substring(0, 1);//(+|-)
+                    int length = Convert.ToInt32(str.Substring(1, str.Length - 1));//数字
+
+                    //MessageBox.Show(type+"\n"+symbol+"\n"+length.ToString());
+                    //MessageBox.Show(dt.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss"));
+
+                    if (symbol == "+")//+
+                    {
+                        //用这条，替换的时候 如果有相同匹配对象，会全部替换成同一个值
+                        //sourceSQL[i] = sourceSQL[i].Replace(matchDateTimeAll.Groups[0].Value, dt.AddDays(length * i).ToString("yyyy-MM-dd HH:mm:ss"));//日+
+                        //用这条，仅替换第一个匹配对象
+                        sourceSQL[i] = rgGetDateAll.Replace(sourceSQL[i], Convert.ToDateTime(dt.AddDays(length * i).ToString("yyyy-MM-dd HH:mm:ss")).ToString("yyyy-MM-dd"), 1);
+                    }
+                    if (symbol == "-")//-
+                    {
+                        //用这条，替换的时候 如果有相同匹配对象，会全部替换成同一个值
+                        //sourceSQL[i] = sourceSQL[i].Replace(matchDateTimeAll.Groups[0].Value, dt.AddDays(-(length * i)).ToString("yyyy-MM-dd HH:mm:ss"));//日-
+                        //用这条，仅替换第一个匹配对象
+                        sourceSQL[i] = rgGetDateAll.Replace(sourceSQL[i], Convert.ToDateTime(dt.AddDays(-(length * i)).ToString("yyyy-MM-dd HH:mm:ss")).ToString("yyyy-MM-dd"), 1);
                     }
                 }
             }
